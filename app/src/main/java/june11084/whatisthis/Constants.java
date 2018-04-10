@@ -5,8 +5,8 @@ package june11084.whatisthis;
  */
 
 public class Constants {
-    public static final String YELP_TOKEN = BuildConfig.GOOGLE_CLOUD_API;
-    public static final String YELP_BASE_URL = "https://api.yelp.com/v3/businesses/search?term=restaurants";
+    public static final String CLOUDVISION_KEY = BuildConfig.GOOGLE_CLOUD_API;
+    public static final String CLOUDVISION_BASE_URL = "https://vision.googleapis.com/v1/images:annotate";
     public static final String YELP_LOCATION_QUERY_PARAMETER = "location";
     public static final String PREFERENCES_LOCATION_KEY = "location";
     public static final String FIREBASE_CHILD_RESTAURANTS = "restaurants";

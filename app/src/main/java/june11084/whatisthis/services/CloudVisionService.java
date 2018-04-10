@@ -1,29 +1,100 @@
 package june11084.whatisthis.services;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import june11084.whatisthis.Constants;
+import june11084.whatisthis.models.PhotoModel;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class CloudVisionService {
-    public static void scanPhoto(String location, Callback callback) {
+    public void scanPhoto(String imageData, Callback callback) {
         OkHttpClient client = new OkHttpClient.Builder().build();
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.YELP_BASE_URL).newBuilder();
-        urlBuilder.addQueryParameter(Constants.YELP_LOCATION_QUERY_PARAMETER, location);
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.CLOUDVISION_BASE_URL).newBuilder();
         String url = urlBuilder.build().toString();
+
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        String apiCallBody = "{\n" +
+                "  \"requests\":[\n" +
+                "    {\n" +
+                "      \"image\":{\n" +
+                "        \"content\": " + imageData + "\n" +
+                "      },\n" +
+                "      \"features\":[\n" +
+                "        {\n" +
+                "          \"type\":\"LABEL_DETECTION\",\n" +
+                "          \"maxResults\":1\n" +
+                "        },\n" +
+                "         {\n" +
+                "          \"type\":\"WEB_DETECTION\",\n" +
+                "          \"maxResults\":10\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        RequestBody body =  RequestBody.create(JSON, apiCallBody);
 
         Request request= new Request.Builder()
                 .url(url)
-                .header("Authorization", Constants.YELP_TOKEN)
+                .header("Authorization", Constants.CLOUDVISION_KEY)
+                .post(body)
                 .build();
 
         Call call = client.newCall(request);
         call.enqueue(callback);
     }
 
-    
+    public ArrayList<PhotoModel> processResults(Response response) {
+        ArrayList<PhotoModel> photos = new ArrayList<>();
+
+        try {
+            String jsonData = response.body().string();
+            JSONObject yelpJSON = new JSONObject(jsonData);
+            JSONArray businessesJSON = yelpJSON.getJSONArray("businesses");
+            for (int i = 0; i < businessesJSON.length(); i++) {
+
+                JSONObject restaurantJSON = businessesJSON.getJSONObject(i);
+
+                ArrayList<String> labels = new ArrayList<>();
+                JSONArray addressJSON = restaurantJSON.getJSONObject("location")
+                        .getJSONArray("display_address");
+                for (int y = 0; y < addressJSON.length(); y++) {
+                    labels.add(addressJSON.get(y).toString());
+                }
+
+                ArrayList<String> webLinks = new ArrayList<>();
+                JSONArray categoriesJSON = restaurantJSON.getJSONArray("categories");
+
+                for (int y = 0; y < categoriesJSON.length(); y++) {
+                    webLinks.add(categoriesJSON.getJSONObject(y).getString("title"));
+                }
+                PhotoModel restaurant = new PhotoModel(labels, webLinks);
+                photos.add(restaurant);
+            }
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        return photos;
+    }
 }
