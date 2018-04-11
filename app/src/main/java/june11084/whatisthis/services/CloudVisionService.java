@@ -40,7 +40,7 @@ public class CloudVisionService {
                 "      \"features\":[\n" +
                 "        {\n" +
                 "          \"type\":\"LABEL_DETECTION\",\n" +
-                "          \"maxResults\":1\n" +
+                "          \"maxResults\":10\n" +
                 "        },\n" +
                 "         {\n" +
                 "          \"type\":\"WEB_DETECTION\",\n" +
