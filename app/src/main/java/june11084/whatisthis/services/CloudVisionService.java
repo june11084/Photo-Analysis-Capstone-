@@ -1,5 +1,7 @@
 package june11084.whatisthis.services;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,10 +23,10 @@ import okhttp3.Response;
 
 
 public class CloudVisionService {
-    public void scanPhoto(String imageData, Callback callback) {
+    public static void scanPhoto(String imageData, Callback callback) {
         OkHttpClient client = new OkHttpClient.Builder().build();
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.CLOUDVISION_BASE_URL).newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(Constants.CLOUDVISION_BASE_URL+ "?key=" +Constants.CLOUDVISION_KEY).newBuilder();
         String url = urlBuilder.build().toString();
 
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -33,7 +35,7 @@ public class CloudVisionService {
                 "  \"requests\":[\n" +
                 "    {\n" +
                 "      \"image\":{\n" +
-                "        \"content\": " + imageData + "\n" +
+                "        \"content\":\"" + imageData + "\"\n" +
                 "      },\n" +
                 "      \"features\":[\n" +
                 "        {\n" +
@@ -49,6 +51,7 @@ public class CloudVisionService {
                 "  ]\n" +
                 "}";
 
+        Log.v("apiCallBody", apiCallBody);
         RequestBody body =  RequestBody.create(JSON, apiCallBody);
 
         Request request= new Request.Builder()
@@ -61,30 +64,32 @@ public class CloudVisionService {
         call.enqueue(callback);
     }
 
-    public ArrayList<PhotoModel> processResults(Response response) {
+    public static ArrayList<PhotoModel> processResults(Response response) {
+        Log.v("respons", response.toString());
         ArrayList<PhotoModel> photos = new ArrayList<>();
-
         try {
             String jsonData = response.body().string();
-            JSONObject yelpJSON = new JSONObject(jsonData);
-            JSONArray businessesJSON = yelpJSON.getJSONArray("businesses");
-            for (int i = 0; i < businessesJSON.length(); i++) {
+            JSONObject CloudVisionJSON = new JSONObject(jsonData);
+            JSONArray responseJSON = CloudVisionJSON.getJSONArray("responses");
+            for (int i = 0; i < responseJSON.length(); i++) {
 
-                JSONObject restaurantJSON = businessesJSON.getJSONObject(i);
+                JSONObject photoJSON = responseJSON.getJSONObject(i);
 
                 ArrayList<String> labels = new ArrayList<>();
-                JSONArray addressJSON = restaurantJSON.getJSONObject("location")
-                        .getJSONArray("display_address");
-                for (int y = 0; y < addressJSON.length(); y++) {
-                    labels.add(addressJSON.get(y).toString());
+                JSONArray labelsJSON = photoJSON.getJSONArray("labelAnnotations");
+                for (int y = 0; y < labelsJSON.length(); y++) {
+                    labels.add(labelsJSON.getJSONObject(y).getString("description"));
+                    Log.v("label", "label ran");
                 }
 
                 ArrayList<String> webLinks = new ArrayList<>();
-                JSONArray categoriesJSON = restaurantJSON.getJSONArray("categories");
-
-                for (int y = 0; y < categoriesJSON.length(); y++) {
-                    webLinks.add(categoriesJSON.getJSONObject(y).getString("title"));
+                JSONObject webLinksJSON = photoJSON.getJSONObject("webDetection");
+                JSONArray webEntitiesJSON = webLinksJSON.getJSONArray("webEntities");
+                for (int y = 0; y < webEntitiesJSON.length(); y++) {
+                    webLinks.add(webEntitiesJSON.getJSONObject(y).optString("description"));
+                    Log.v("webLinks", "webLinks ran");
                 }
+
                 PhotoModel restaurant = new PhotoModel(labels, webLinks);
                 photos.add(restaurant);
             }
