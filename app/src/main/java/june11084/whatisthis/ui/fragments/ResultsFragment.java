@@ -14,9 +14,22 @@ import june11084.whatisthis.R;
  */
 public class ResultsFragment extends Fragment {
 
+    public static final String ARG_PAGE = "ARG_PAGE";
 
-    public ResultsFragment() {
-        // Required empty public constructor
+    private int mPage;
+
+    public static CameraFragment newInstance(int page) {
+        Bundle args = new Bundle();
+        args.putInt(ARG_PAGE, page);
+        CameraFragment fragment = new CameraFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPage = getArguments().getInt(ARG_PAGE);
     }
 
 

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getPhotoResults(String imageData){
         CloudVisionService service = new CloudVisionService();
-        CloudVisionService.scanPhoto(imageData, new Callback() {
+        service.scanPhoto(imageData, new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.v("APICALL", "Succeed");
                 mPhotos = CloudVisionService.processResults(response);
                 Log.v("mPhotos", mPhotos.toString());
-                getParent().runOnUiThread(new Runnable() {
+                MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 //                        mAdapter = new RestaurantListAdapter(getActivity(), mRestaurants, mOnRestaurantSelectedListener);

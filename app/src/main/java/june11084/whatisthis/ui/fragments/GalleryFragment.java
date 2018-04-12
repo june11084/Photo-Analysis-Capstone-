@@ -9,15 +9,26 @@ import android.view.ViewGroup;
 
 import june11084.whatisthis.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class GalleryFragment extends Fragment {
+    public static final String ARG_PAGE = "ARG_PAGE";
 
+    private int mPage;
 
-    public GalleryFragment() {
-        // Required empty public constructor
+    public static CameraFragment newInstance(int page) {
+        Bundle args = new Bundle();
+        args.putInt(ARG_PAGE, page);
+        CameraFragment fragment = new CameraFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPage = getArguments().getInt(ARG_PAGE);
+    }
+
 
 
     @Override
