@@ -9,19 +9,17 @@ import android.view.ViewGroup;
 
 import june11084.whatisthis.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class ResultsFragment extends Fragment {
 
     public static final String ARG_PAGE = "ARG_PAGE";
 
     private int mPage;
 
-    public static CameraFragment newInstance(int page) {
+    public static ResultsFragment newInstance(int page) {
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
-        CameraFragment fragment = new CameraFragment();
+        ResultsFragment fragment = new ResultsFragment();
         fragment.setArguments(args);
         return fragment;
     }

@@ -10,8 +10,8 @@ import june11084.whatisthis.ui.fragments.GalleryFragment;
 import june11084.whatisthis.ui.fragments.ResultsFragment;
 
 public class MainActivityTabAdapter extends FragmentStatePagerAdapter{
-    final int PAGE_COUNT = 3;
-    private String tabTitles[] = new String[] { "Camera", "Gallery", "Results" };
+    final int PAGE_COUNT = 2;
+    private String tabTitles[] = new String[] {"Gallery", "Results" };
     private Context context;
 
     public MainActivityTabAdapter(FragmentManager fm, Context context) {
@@ -29,12 +29,9 @@ public class MainActivityTabAdapter extends FragmentStatePagerAdapter{
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = CameraFragment.newInstance(position + 0);
+                fragment = GalleryFragment.newInstance(position);
                 break;
             case 1:
-                fragment = GalleryFragment.newInstance(position + 1 );
-                break;
-            case 2:
                 fragment = ResultsFragment.newInstance(position +1);
                 break;
         }
